@@ -1,6 +1,6 @@
 # Pakker
 
-**TODO: Add description**
+An application to read data from Cambpell packbus dataloggers
 
 ## Installation
 
