@@ -30,8 +30,8 @@ defmodule PakkerMessageTest do
     assert meta[:message].message_type == 0x81
   end
 
-  # test "it finds the message type atom",meta do
-  #   assert meta[:message].message_type_atom() == :delivery_failure
-  # end
+  test "it finds the message type atom",meta do
+    assert Pakker.Message.message_type_atom(meta[:message]) == :delivery_message
+  end
 
 end
