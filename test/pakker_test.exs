@@ -3,6 +3,7 @@ defmodule PakkerTest do
   doctest Pakker
 
   setup do
+    # ring packet from 4094 to pakbus address 1 "BD 90 01 0F FE 71 D2 BD"
     bits = << 0x10, 0xab, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 >>
     packet = Pakker.Packet.from_bits(bits)
     {:ok, packet: packet}
