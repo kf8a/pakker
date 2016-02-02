@@ -5,14 +5,14 @@ defmodule Pakker.Message do
 
   # SerPkt message types
   def message_type_atom(message) do
-    case message.hi_proto do
+    case message.hi_proto_code do
       0 -> pakctrl(message)
       1 -> bmp(message)
     end
   end
 
   # PakCtrl messages if hiProto == 0
-  defp pakctl(message) do
+  defp pakctrl(message) do
     case message.message_type do
       0x81 -> :delivery_message
       0x09 -> :hello
