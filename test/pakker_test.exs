@@ -32,7 +32,7 @@ defmodule PakkerMessageTest do
   end
 
   test "it finds the message type atom",meta do
-    assert Pakker.Message.message_type_atom(meta[:message]) == :delivery_message
+    assert Pakker.Message.pakctrl(meta[:message]) == :delivery_message
   end
-
 end
+

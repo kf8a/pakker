@@ -4,15 +4,15 @@ defmodule Pakker.Message do
             body: nil
 
   # SerPkt message types
-  def message_type_atom(message) do
-    case message.hi_proto_code do
+  def message_type_atom(header, message) do
+    case header.hi_proto_code do
       0 -> pakctrl(message)
       1 -> bmp(message)
     end
   end
 
   # PakCtrl messages if hiProto == 0
-  defp pakctrl(message) do
+  def pakctrl(message) do
     case message.message_type do
       0x81 -> :delivery_message
       0x09 -> :hello
@@ -37,8 +37,7 @@ defmodule Pakker.Message do
     end
   end
 
-  #TODO set BMP message types
-  defp bmp(message) do
+  def bmp(message) do
     case message.message_type do
       0xa1 -> :please_wait
       0x17 -> :clock_command
