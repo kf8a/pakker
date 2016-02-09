@@ -52,4 +52,10 @@ defmodule PakkerSetSerTest do
   test "it reads the destination physical address as 1", meta do
     assert meta[:packet].dest_physical_address == 0b1
   end
+
+  test "it reads the source physical address as 4094", meta do
+    assert meta[:packet].source_physical_address == 4094
+  end
+
 end
+
