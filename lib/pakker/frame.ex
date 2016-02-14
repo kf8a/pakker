@@ -4,9 +4,13 @@
 defmodule Pakker.Frame do
   # convert bits to frames
   def from_bits(bits) do
-    front = remove_set_ser_bytes(bits)
-    back = remove_set_ser_bytes(String.reverse(front))
-    String.reverse(back)
+    bits
+    |> remove_set_ser_bytes()
+    |> Enum.reverse()
+    |> Enum.into(<<>>)
+    |> remove_set_ser_bytes()
+    |> Enum.reverse()
+    |> Enum.into(<<>>)
     #unquote
   end
 
