@@ -59,3 +59,18 @@ defmodule PakkerSetSerTest do
 
 end
 
+defmodule PakkerFrame do
+  use ExUnit.Case
+
+  setup do
+    # ring packet from 4094 to pakbus address 1 "BD 90 01 0F FE 71 D2 BD"
+    bits = << 0xbd, 0xbd, 0xbd, 0x90, 0x01, 0x0f, 0xfe, 0x71, 0xd2, 0xbd >>
+    packet = Pakker.Frame.from_bits(bits)
+    {:ok, packet: packet}
+  end
+
+  test "it removes SerSync bytes", meta do
+    assert meta[:packet] == << 0x90, 0x01, 0x0f, 0xfe, 0x71, 0xd2 >>
+  end
+
+end
