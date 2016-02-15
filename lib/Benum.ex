@@ -1,15 +1,16 @@
+# from https://gist.github.com/brweber2/b724969b5d1d35443e6c
 defmodule Benum do
   defimpl Enumerable, for: BitString do
     def count(collection) when is_binary(collection) do
-      {:ok, Enum.reduce(collection, 0, fn v, acc -> acc + 1 end)}
+      {:ok, Enum.reduce(collection, 0, fn _v, acc -> acc + 1 end)}
     end
-    def count(collection) do
+    def count(_collection) do
       {:error, __MODULE__}
     end
     def member?(collection, value) when is_binary(collection) do
       {:ok, Enum.any?(collection, fn v -> value == v end)}
     end
-    def member?(collection, value) do
+    def member?(_collection, _value) do
       {:error, __MODULE__}
     end
 
