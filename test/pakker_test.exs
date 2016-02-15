@@ -74,3 +74,17 @@ defmodule PakkerFrame do
   end
 
 end
+
+# defmodule PakkerFrameQuote do
+#   use ExUnit.Case
+
+#   setup do
+#     bits = << 0x90, 0xbc, 0xdd, 0x01, 0x0f, 0xfe, 0x71, 0xbc, 0xdc, 0xd2 >>
+#     packet = Pakker.Frame.unquote_message(bits)
+#     {:ok, packet: packet}
+#   end
+
+#   test "it unquotes SerSync and quote bytes", meta do
+#     assert meta[:packet] == << 0x90, 0xbd, 0x01, 0x0f, 0xfe, 0x71, 0xbd, 0xd2 >>
+#   end
+# end
