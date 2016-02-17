@@ -64,7 +64,7 @@ defmodule PakkerFrame do
 
   setup do
     # ring packet from 4094 to pakbus address 1 "BD 90 01 0F FE 71 D2 BD"
-    bits = << 0xbd, 0xbd, 0xbd, 0x90, 0x01, 0x0f, 0xfe, 0x71, 0xd2, 0xbd >>
+    bits = << 0xbd, 0xbd, 0xbd, 0xbd, 0x90, 0x01, 0x0f, 0xfe, 0x71, 0xd2, 0xbd >>
     packet = Pakker.Frame.from_bits(bits)
     {:ok, packet: packet}
   end
@@ -75,16 +75,16 @@ defmodule PakkerFrame do
 
 end
 
-# defmodule PakkerFrameQuote do
-#   use ExUnit.Case
+defmodule PakkerFrameQuote do
+  use ExUnit.Case
 
-#   setup do
-#     bits = << 0x90, 0xbc, 0xdd, 0x01, 0x0f, 0xfe, 0x71, 0xbc, 0xdc, 0xd2 >>
-#     packet = Pakker.Frame.unquote_message(bits)
-#     {:ok, packet: packet}
-#   end
+  setup do
+    bits = << 0x90,  0xbc, 0xdd, 0x01, 0x0f, 0xfe, 0x71, 0xbc, 0xdc, 0xd2 >>
+    packet = Pakker.Frame.unquote_message(bits)
+    {:ok, packet: packet}
+  end
 
-#   test "it unquotes SerSync and quote bytes", meta do
-#     assert meta[:packet] == << 0x90, 0xbd, 0x01, 0x0f, 0xfe, 0x71, 0xbd, 0xd2 >>
-#   end
-# end
+  test "it unquotes SerSync and quote bytes", meta do
+    assert meta[:packet] == << 0x90, 0xbd, 0x01, 0x0f, 0xfe, 0x71, 0xbc, 0xd2 >>
+  end
+end

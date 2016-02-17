@@ -18,20 +18,26 @@ defmodule Pakker.Frame do
   end
 
   def unquote_message(bits) do
-    # Enum.flat_map_reduce(bits, [], fn(x, acc) -> unquote_special_byte_sequence(x, acc) end )
+    Enum.scan(bits, fn(x,acc) -> unquote_special_byte_sequence(x,acc) end )
+    |> Enum.filter(fn(x) -> x != :quote end)
+    |> Enum.into(<<>>)
   end
 
-  # defp unquote_special_byte_sequence(byte, []) do
-  #   byte
-  # end
+  defp unquote_special_byte_sequence(byte, []) do
+    byte
+  end
 
-  # defp unquote_special_byte_sequence(byte, acc) do
-  #   case [Enum.fetch!(acc, -1), byte] do 
-  #   [<< 0xbc>>, <<0xdd>>] -> [acc , << 0xbd >>]
-  #   [ <<0xbc>>,  <<0xdc>> ] -> [acc , << 0xbc >>]
-  #   [ a, b] -> [acc , b]
-  #   end
-  # end
+  defp unquote_special_byte_sequence(byte, _) do
+    if (byte == << 0xbc >>) do
+      :quote
+    else
+      case byte do 
+      <<0xdc>> -> << 0xbc >>
+      <<0xdd>> -> << 0xbd >>
+      a -> a
+      end
+    end
+  end
 
   defp remove_set_ser_bytes(bits) do
     case bits do
@@ -39,10 +45,5 @@ defmodule Pakker.Frame do
       << body :: bitstring >> -> body
     end
   end
-
-  def cons([], count), do: []
-  def cons([_ | tail] = list, count), do: [Enum.take(list, count) | cons(tail, count)]
-
-
 
 end
