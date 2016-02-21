@@ -14,6 +14,11 @@ defmodule Pakker.Frame do
     #unquote
   end
 
+  def to_bits(message) do
+    [<<0xbd >>, message,<<  0xbd>>]
+    |> flatten |> Enum.into(<<>>)
+  end
+
   def quote_message(message) do
     Enum.scan(message, fn(x,acc) -> quote_special_byte_sequence(x,acc) end )
     |> flatten
