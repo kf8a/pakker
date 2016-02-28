@@ -1,5 +1,7 @@
 # SetSer Link SubProtocol
 defmodule Pakker.SetSerPkt do
+  use Bitwise
+
   defstruct link_state: nil,
             dest_physical_address: nil,
             expect_more: nil,
@@ -23,5 +25,10 @@ defmodule Pakker.SetSerPkt do
         source_physical_address: source_physical_address,
         body: body
       }
+    end
+
+    def to_bits(pkt) do
+      result = <<>>
+      result = result <<< pkt.link_state
     end
 end

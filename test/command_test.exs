@@ -1,0 +1,13 @@
+defmodule Pakker.Command do
+  def hello(from, to) do
+    << 0xbd, 0xbd, 0x90, 0x01, 0x0f, 0xfe, 0x71, 0xd2, 0xbd >>
+  end
+end
+
+defmodule CommandTest do
+  use ExUnit.Case
+
+  test "it sends a hello string from address 4094 to 1" do
+    assert Pakker.Command.hello(4094, 1) == << 0xbd, 0xbd, 0x90, 0x01, 0x0f, 0xfe, 0x71, 0xd2, 0xbd >>
+  end
+end
