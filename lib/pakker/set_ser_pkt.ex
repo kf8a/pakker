@@ -28,7 +28,19 @@ defmodule Pakker.SetSerPkt do
     end
 
     def to_bits(pkt) do
-      result = <<>>
-      result = result <<< pkt.link_state
+      link_state_bits = case pkt.link_state do
+        :ring     -> 0b1010
+        :off_line -> 0b1000
+        :ready    -> 0b1010
+        :finished -> 0b1011
+        :pause    -> 0b1100
+      end
+      more_code_bits = case pkt.expect_more do
+        :last    -> 0b00
+        :more    -> 0b01
+        :neutral -> 0b10
+        :reverse -> 0b11
+      end
+      link_state_bits + 0b000 + pkt.dest_physical_address #+ more_code_bits <<< 6
     end
 end
