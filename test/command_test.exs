@@ -7,7 +7,7 @@ defmodule Pakker.Command do
         priority: 0,
         source_physical_address: from}
 
-   Pakker.SetSerPkt.to_bits(pkt) 
+   Pakker.SetSerPkt.to_bits(pkt) |> Pakker.Frame.to_bits
   end
 end
 
@@ -17,6 +17,6 @@ defmodule CommandTest do
   test "it sends a hello string from address 4094 to 1" do
     result = Pakker.Command.ring(4094,1)
     #assert result == << 0xbd, 0x90, 0x01, 0x0f, 0xfe, 0x71, 0xd2, 0xbd >>
-    assert result == << 0x90, 0x01, 0x0f, 0xfe >>
+   assert result == << 0xbd, 0x90, 0x01, 0x0f, 0xfe, 0xbd >>
   end
 end
