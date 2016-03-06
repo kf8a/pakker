@@ -86,5 +86,12 @@ defmodule PakkerFrame do
     packet = Pakker.Frame.to_bits(message)
     assert packet == << 0xbd, 0x90, 0xbd, 0x01, 0xbd >>
   end
+
+  # test 'compute signature bytes' do
+  #   message = << 0x90, 0x01, 0x0f, 0x71 >>
+  #   correct_signature = <<0x71, 0xd2 >>
+  #   signature = Pakker.Frame.sig(message)
+  #   assert signature == correct_signature
+  # end
 end
 

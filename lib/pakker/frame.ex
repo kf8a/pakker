@@ -66,4 +66,7 @@ defmodule Pakker.Frame do
     end
   end
 
+  def signature(message) do
+    message |> Enum.map
+  end
 end
