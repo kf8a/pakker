@@ -55,7 +55,7 @@ defmodule Pakker.Signature do
   end
 
   def compute_seed(seed, c, j) do
-    bor(band(seed + (j >>> 8) + c, 0xff), band(j <<< 8, 0xffff))
+    bor(band(seed + (j >>> 8) + :binary.decode_unsigned(c), 0xff), band(j <<< 8, 0xffff))
   end
 end
 
@@ -63,13 +63,13 @@ defmodule Signaturetest do
   use ExUnit.Case
 
   test 'compute seed' do
-    assert 0xaaf5 == Pakker.Signature.compute_seed(0xaaa , 65, 0xaaa)
+    assert 0xaaf5 == Pakker.Signature.compute_seed(0xaaa , "A", 0xaaa)
   end
 
-  # test 'compute signature bytes' do
-  #   message = << 0x90, 0x01, 0x0f, 0x71 >>
-  #   correct_signature = <<0x71, 0xd2 >>
-  #   signature = Pakker.Signature.calc_sig(message)
-  #   assert signature == correct_signature
-  # end
+  test 'compute signature bytes' do
+    message = << 0x90, 0x01, 0x0f, 0x71 >>
+    correct_signature = <<0x71, 0xd2 >>
+    signature = Pakker.Signature.calc_sig(message)
+    assert signature == correct_signature
+  end
 end
