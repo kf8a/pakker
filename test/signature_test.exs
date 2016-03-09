@@ -27,11 +27,23 @@
 defmodule Pakker.Signature do
   use Bitwise
 
-  def sig(_message) do
+  def calc_sig_nullifier(sig) do
+    new_seed = band(sig<<<1, 0x1ff)
+    new_sig = sig
+    new_seed =increment_seed(new_seed)
+    null1 = band(0x0100 - (new_seed + (sig >>> 8 )), 0xff)
+    IO.inspect(null1)
+    IO.inspect(sig)
+    new_sig = csi_alg(null1, sig)
+
+    new_seed = band((new_sig <<< 1), 0x01ff)
+    new_seed =increment_seed(new_seed)
+    null2 = 0x0100 - (new_seed + (new_sig >>> 8))
+    <<null1, null2>>
   end
 
   def calc_sig(message, seed \\ 0xAAAA) do
-    Enum.map(message, fn x -> csi_alg(x,seed) end)
+    Enum.reduce(message, seed, fn(x, seed) -> csi_alg(x,seed) end)
   end
 
   def csi_alg(byte, seed) do
@@ -66,10 +78,11 @@ defmodule Signaturetest do
     assert 0xaaf5 == Pakker.Signature.compute_seed(0xaaa , "A", 0xaaa)
   end
 
-  test 'compute signature bytes' do
+  test 'compute signature nullifer bytes' do
     message = << 0x90, 0x01, 0x0f, 0x71 >>
-    correct_signature = <<0x71, 0xd2 >>
     signature = Pakker.Signature.calc_sig(message)
-    assert signature == correct_signature
+    nullifier = Pakker.Signature.calc_sig_nullifier(signature)
+    correct_nullifer = <<0x71, 0xd2 >>
+    assert nullifier == correct_nullifer
   end
 end
