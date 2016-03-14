@@ -23,35 +23,53 @@
 #   }
 #   return rtn;
 # } // calcSigFor
+  # Pythonish version
+  # def calcSigFor(buff, seed = 0xAAAA) do
+  #   sig = seed
+  #   for x in buff:
+  #     x = ord(x)
+  #     j = sig
+  #     sig = (sig <<1) & 0x1FF
+  #     if sig >= 0x100: sig += 1
+  #     sig = ((((sig + (j >>8) + x) & 0xFF) | (j <<8))) & 0xFFFF
+  #   sig
+  # end
+
 
 defmodule Pakker.Signature do
   use Bitwise
 
   def calc_sig_nullifier(sig) do
-    new_seed = band(sig<<<1, 0x1ff)
-    new_sig = sig
+    new_seed = band(sig <<< 1, 0x1ff)
     new_seed =increment_seed(new_seed)
-    null1 = band(0x0100 - (new_seed + (sig >>> 8 )), 0xff)
-    IO.inspect(null1)
-    IO.inspect(sig)
-    new_sig = csi_alg(null1, sig)
+    null1 = compute_null(sig, new_seed)
+    new_sig = calc_sig([null1], sig)
 
-    new_seed = band((new_sig <<< 1), 0x01ff)
+    new_seed = band(new_sig <<< 1, 0x01ff)
     new_seed =increment_seed(new_seed)
-    null2 = 0x0100 - (new_seed + (new_sig >>> 8))
+    null2 = compute_null(sig, new_seed)
     <<null1, null2>>
   end
 
-  def calc_sig(message, seed \\ 0xAAAA) do
-    Enum.reduce(message, seed, fn(x, seed) -> csi_alg(x,seed) end)
+  def calc_sig([byte | tail], sig) do
+    x = case is_binary(byte) do
+      true -> :binary.decode_unsigned(byte)
+      false -> byte
+    end
+
+    j = sig
+    sig = band((sig <<< 1), 0x1ff)
+    sig = increment_seed(sig)
+    sig = compute_next_sig(sig, j, x)
+    calc_sig(tail, sig)
   end
 
-  def csi_alg(byte, seed) do
-    old_seed = seed
-    seed 
-    |> shift_and_add_1ff
-    |> increment_seed 
-    |> compute_seed(byte, old_seed)
+  def calc_sig([], sig) do
+    sig 
+  end
+
+  def compute_null(sig, seed) do
+    band(0x0100 - (seed + (sig >>> 8 )), 0xff)
   end
 
   def increment_seed(seed) when seed >= 0x100 do
@@ -62,25 +80,26 @@ defmodule Pakker.Signature do
     seed
   end
 
-  def shift_and_add_1ff(seed) do
-    band(band(seed <<< 1, 0x01ff), 0xffff)
+  def compute_next_sig(sig, x, j) do
+    band(bor(band(sig + (j >>> 8) + x, 0xff), (j <<<8)), 0xffff)
   end
 
-  def compute_seed(seed, c, j) do
-    bor(band(seed + (j >>> 8) + :binary.decode_unsigned(c), 0xff), band(j <<< 8, 0xffff))
-  end
 end
 
 defmodule Signaturetest do
   use ExUnit.Case
 
   test 'compute seed' do
-    assert 0xaaf5 == Pakker.Signature.compute_seed(0xaaa , "A", 0xaaa)
+    assert 43765 == Pakker.Signature.compute_next_sig(0xaaa , 65, 0xaaa)
+  end
+
+  test 'compute null' do
+    assert 0 == Pakker.Signature.compute_null(0xdd, 0xaaa)
   end
 
   test 'compute signature nullifer bytes' do
     message = << 0x90, 0x01, 0x0f, 0x71 >>
-    signature = Pakker.Signature.calc_sig(message)
+    signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
     nullifier = Pakker.Signature.calc_sig_nullifier(signature)
     correct_nullifer = <<0x71, 0xd2 >>
     assert nullifier == correct_nullifer
