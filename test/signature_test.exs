@@ -94,7 +94,7 @@ defmodule Signaturetest do
   end
 
   test 'compute null' do
-    assert 0 == Pakker.Signature.compute_null(0xdd, 0xaaa)
+    assert 86 == Pakker.Signature.compute_null(0xdd, 0xaaa)
   end
 
   test 'compute signature nullifer bytes' do
