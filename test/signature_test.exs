@@ -1,40 +1,3 @@
-# // signature algorithm.
-# // Standard signature is initialized with a seed of
-# // 0xaaaa. Returns signature.  If the function is called
-# // on a partial data set, the return value should be
-# // used as the seed for the remainder
-# typedef unsigned short uint2;
-# typedef unsigned long uint4;
-# typedef unsigned char byte;
-# uint2 calcSigFor(void const *buff, uint4 len, uint2 seed=0xAAAA)
-# {
-#   uint2 j, n;
-#   uint2 rtn = seed;
-#   byte const *str = (byte const *)buff;
-#   // calculate a representative number for the byte
-#   // block using the CSI signature algorithm.
-#   for (n = 0; n < len; n++)
-#   {
-#     j = rtn;
-#     rtn = (rtn << 1) & (uint2)0x01FF;
-#     if (rtn >= 0x100)
-#     rtn++;
-#     rtn = (((rtn + (j >> 8) + str[n]) & (uint2)0xFF) | (j << 8));
-#   }
-#   return rtn;
-# } // calcSigFor
-  # Pythonish version
-  # def calcSigFor(buff, seed = 0xAAAA) do
-  #   sig = seed
-  #   for x in buff:
-  #     x = ord(x)
-  #     j = sig
-  #     sig = (sig <<1) & 0x1FF
-  #     if sig >= 0x100: sig += 1
-  #     sig = ((((sig + (j >>8) + x) & 0xFF) | (j <<8))) & 0xFFFF
-  #   sig
-  # end
-
 
 defmodule Pakker.Signature do
   use Bitwise
@@ -45,18 +8,14 @@ defmodule Pakker.Signature do
     null1 = compute_null(sig, new_seed)
     new_sig = calc_sig([null1], sig)
 
-    new_seed = band(new_sig <<< 1, 0x01ff)
+    new_seed = band(new_sig <<< 1, 0x1ff)
     new_seed =increment_seed(new_seed)
     null2 = compute_null(sig, new_seed)
     <<null1, null2>>
   end
 
   def calc_sig([byte | tail], sig) do
-    x = case is_binary(byte) do
-      true -> :binary.decode_unsigned(byte)
-      false -> byte
-    end
-
+    x = ord(byte)
     j = sig
     sig = band((sig <<< 1), 0x1ff)
     sig = increment_seed(sig)
@@ -65,7 +24,15 @@ defmodule Pakker.Signature do
   end
 
   def calc_sig([], sig) do
-    sig 
+    sig
+  end
+
+  def ord(byte) when is_binary(byte) do
+    :binary.decode_unsigned(byte)
+  end
+
+  def ord(byte) do
+    byte
   end
 
   def compute_null(sig, seed) do
@@ -73,7 +40,7 @@ defmodule Pakker.Signature do
   end
 
   def increment_seed(seed) when seed >= 0x100 do
-    band(seed + 1, 0xffff)
+      band(seed + 1, 0xffff)
   end
 
   def increment_seed(seed) do
@@ -97,11 +64,26 @@ defmodule Signaturetest do
     assert 86 == Pakker.Signature.compute_null(0xdd, 0xaaa)
   end
 
+  test 'compute signature for "message" ' do
+		# {"message", 0x1a17},
+    assert 0x1a17 == Pakker.Signature.calc_sig('message', 0xAAAA)
+  end
+
+  test 'compute signature for "testing"' do
+		# {"testing", 0x1ef5},
+    assert 0x1ef5 == Pakker.Signature.calc_sig('testing', 0xAAAA)
+    # message = << 0x90, 0x01, 0x0f, 0x71 >>
+    # signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
+    # assert signature == << 0 >>
+  end
+
   test 'compute signature nullifer bytes' do
-    message = << 0x90, 0x01, 0x0f, 0x71 >>
-    signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
-    nullifier = Pakker.Signature.calc_sig_nullifier(signature)
-    correct_nullifer = <<0x71, 0xd2 >>
-    assert nullifier == correct_nullifer
+    assert << 0xb8, 0xe9>> == Pakker.Signature.calc_sig_nullifier(0x1a17)
+		# {0x23a7, 0x8e59},
+    # message = << 0x90, 0x01, 0x0f, 0x71 >>
+    # signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
+    # nullifier = Pakker.Signature.calc_sig_nullifier(signature)
+    # correct_nullifer = <<0x71, 0xd2 >>
+    # assert nullifier == correct_nullifer
   end
 end
