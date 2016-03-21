@@ -108,7 +108,8 @@ defmodule Signaturetest do
     assert 13217 == signature
   end
 
-  # test 'compute signature nullifer byte for packet' do
-  #   assert <<0x71, 0xd2 >> == Pakker.Signature.calc_sig_nullifier(13217)
-  # end
+  test 'compute signature nullifer byte for packet' do
+    # assert <<0x71, 0xd2 >> == Pakker.Signature.calc_sig_nullifier(13217)
+    assert <<0x8a, 95 >> == Pakker.Signature.calc_sig_nullifier(13217)
+  end
 end
