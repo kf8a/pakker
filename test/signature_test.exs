@@ -3,14 +3,15 @@ defmodule Pakker.Signature do
   use Bitwise
 
   def calc_sig_nullifier(sig) do
-    new_seed = band(sig <<< 1, 0x1ff)
-    new_seed =increment_seed(new_seed)
-    null1 = compute_null(sig, new_seed)
-    new_sig = calc_sig([null1], sig)
+    sig = calc_sig('', sig)
+    sig2 = band((sig <<< 1), 0x1ff)
+    sig2 = increment_seed(sig2)
+    null1 = compute_null(sig, sig2)
 
-    new_seed = band(new_sig <<< 1, 0x1ff)
-    new_seed =increment_seed(new_seed)
-    null2 = compute_null(sig, new_seed)
+    sig = calc_sig([null1], sig)
+    sig2 = band((sig <<< 1), 0x1ff)
+    sig2 = increment_seed(sig2)
+    null2 = compute_null(sig, sig2)
     <<null1, null2>>
   end
 
@@ -94,18 +95,16 @@ defmodule Signaturetest do
 
   test 'compute signature for "testing"' do
     assert 0x1ef5 == Pakker.Signature.calc_sig('testing', 0xAAAA)
-    # message = << 0x90, 0x01, 0x0f, 0x71 >>
-    # signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
-    # assert signature == << 0 >>
   end
 
-  # test 'compute signature nullifer bytes' do
-  #   assert << 0xb8, 0xe9>> == Pakker.Signature.calc_sig_nullifier(0x1a17)
+  test 'compute signature nullifer bytes' do
+    assert << 0xb8, 0xe9>> == Pakker.Signature.calc_sig_nullifier(0x1a17)
+  end
+
+  # test 'compute signature nullifer byte for packet' do
 		# # {0x23a7, 0x8e59},
-  #   # message = << 0x90, 0x01, 0x0f, 0x71 >>
-  #   # signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
-  #   # nullifier = Pakker.Signature.calc_sig_nullifier(signature)
-  #   # correct_nullifer = <<0x71, 0xd2 >>
-  #   # assert nullifier == correct_nullifer
+  #   message = << 0x90, 0x01, 0x0f, 0x71 >>
+  #   signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
+  #   assert <<0x71, 0xd2 >> == Pakker.Signature.calc_sig_nullifier(signature)
   # end
 end
