@@ -102,10 +102,13 @@ defmodule Signaturetest do
     assert << 0xb8, 0xe9>> == Pakker.Signature.calc_sig_nullifier(0x1a17)
   end
 
+  test 'compute signature for packet' do
+    message = << 0x90, 0x01, 0x0f, 0x71 >>
+    signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
+    assert 13217 == signature
+  end
+
   # test 'compute signature nullifer byte for packet' do
-		# # {0x23a7, 0x8e59},
-  #   message = << 0x90, 0x01, 0x0f, 0x71 >>
-  #   signature = Pakker.Signature.calc_sig(:erlang.binary_to_list(message), 0xAAAA)
-  #   assert <<0x71, 0xd2 >> == Pakker.Signature.calc_sig_nullifier(signature)
+  #   assert <<0x71, 0xd2 >> == Pakker.Signature.calc_sig_nullifier(13217)
   # end
 end
