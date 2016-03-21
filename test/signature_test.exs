@@ -2,16 +2,17 @@
 defmodule Pakker.Signature do
   use Bitwise
 
-  def calc_sig_nullifier(sig) do
-    sig = calc_sig('', sig)
+  def calc_sig_nullifier(byte, sig) do
+    sig = calc_sig(byte, sig)
     sig2 = band((sig <<< 1), 0x1ff)
     sig2 = increment_seed(sig2)
-    null1 = compute_null(sig, sig2)
+    compute_null(sig, sig2)
+  end
 
-    sig = calc_sig([null1], sig)
-    sig2 = band((sig <<< 1), 0x1ff)
-    sig2 = increment_seed(sig2)
-    null2 = compute_null(sig, sig2)
+  def calc_sig_nullifier(sig) do
+    null1 = calc_sig_nullifier('', sig)
+    null2 = calc_sig_nullifier([null1], sig)
+
     <<null1, null2>>
   end
 
@@ -19,8 +20,8 @@ defmodule Pakker.Signature do
     x = ord(byte)
     j = sig
     sig = band((sig <<< 1), 0x1ff)
-    sig = increment_seed(sig)
-    sig = compute_next_sig(sig, j, x)
+    |> increment_seed()
+    |> compute_next_sig(j, x)
     calc_sig(tail, sig)
   end
 
