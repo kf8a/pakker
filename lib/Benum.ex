@@ -1,5 +1,9 @@
-# from https://gist.github.com/brweber2/b724969b5d1d35443e6c
 defmodule Benum do
+  @moduledoc """
+  A module to add enumerable to bitstring
+
+  from https://gist.github.com/brweber2/b724969b5d1d35443e6c
+  """
   defimpl Enumerable, for: BitString do
     def count(collection) when is_binary(collection) do
       {:ok, Enum.reduce(collection, 0, fn _v, acc -> acc + 1 end)}

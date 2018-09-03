@@ -1,4 +1,7 @@
 defmodule Pakker.Packet do
+  @moduledoc """
+  Struct to hold a pakbus packet
+  """
   defstruct link_state: nil,
             dest_physical_address: nil,
             expect_more: nil,
